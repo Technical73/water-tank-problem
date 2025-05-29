@@ -3,10 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <title>Water Tank Grid View</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <h1>Water Tank Grid View</h1>
+    <label for="heightInput">Enter wall heights (e.g., 0,1,0,2,...):</label>
+    <input
+      id="heightInput"
+      type="text"
+      placeholder="e.g. 0,1,0,2,1,0,1,3,2,1,2,1"
+    />
+    <button onclick="renderChart()">Generate Chart</button>
     <p id="total"></p>
     <svg id="chart" width="600" height="300"></svg>
 

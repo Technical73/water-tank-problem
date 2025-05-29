@@ -1,67 +1,85 @@
-const heights = [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1];
+function renderChart() {
+  const input = document.getElementById("heightInput").value;
 
-const svg = document.getElementById("chart");
-const svgWidth = parseInt(svg.getAttribute("width"));
-const svgHeight = parseInt(svg.getAttribute("height"));
+  const heights = input
+    .split(",")
+    .map((str) => parseInt(str.trim()))
+    .filter((num) => !isNaN(num));
 
-const blockWidth = 30;
-const blockSpacing = 5;
-const scale = 20;
+  if (heights.length === 0) {
+    alert("Please enter valid comma-separated numbers.");
+    return;
+  }
 
-const maxHeight = Math.max(...heights);
-const n = heights.length;
+  const svg = document.getElementById("chart");
+  svg.innerHTML = "";
 
-const leftMax = [];
-const rightMax = [];
+  const svgWidth = parseInt(svg.getAttribute("width"));
+  const svgHeight = parseInt(svg.getAttribute("height"));
+  const blockWidth = 30;
+  const blockSpacing = 5;
+  const scale = 20;
 
-let currentMax = 0;
-for (let i = 0; i < n; i++) {
-  currentMax = Math.max(currentMax, heights[i]);
-  leftMax[i] = currentMax;
-}
+  const maxHeight = Math.max(...heights);
+  const n = heights.length;
 
-currentMax = 0;
-for (let i = n - 1; i >= 0; i--) {
-  currentMax = Math.max(currentMax, heights[i]);
-  rightMax[i] = currentMax;
-}
+  const leftMax = [];
+  const rightMax = [];
 
-const water = [];
-let totalWater = 0;
+  let currentMax = 0;
+  for (let i = 0; i < n; i++) {
+    currentMax = Math.max(currentMax, heights[i]);
+    leftMax[i] = currentMax;
+  }
 
-for (let i = 0; i < n; i++) {
-  const waterLevel = Math.min(leftMax[i], rightMax[i]);
-  const trapped = Math.max(0, waterLevel - heights[i]);
-  water[i] = trapped;
-  totalWater += trapped;
-}
+  currentMax = 0;
+  for (let i = n - 1; i >= 0; i--) {
+    currentMax = Math.max(currentMax, heights[i]);
+    rightMax[i] = currentMax;
+  }
 
-document.getElementById(
-  "total"
-).textContent = `Total Water Trapped: ${totalWater} units`;
+  const water = [];
+  let totalWater = 0;
 
-for (let i = 0; i < n; i++) {
-  const wall = heights[i];
-  const waterAbove = water[i];
+  for (let i = 0; i < n; i++) {
+    const waterLevel = Math.min(leftMax[i], rightMax[i]);
+    const trapped = Math.max(0, waterLevel - heights[i]);
+    water[i] = trapped;
+    totalWater += trapped;
+  }
 
-  for (let row = 0; row < maxHeight; row++) {
-    const x = i * (blockWidth + blockSpacing);
-    const y = svgHeight - (row + 1) * scale;
+  document.getElementById(
+    "total"
+  ).textContent = `Total Water Trapped: ${totalWater} units`;
 
-    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    rect.setAttribute("x", x);
-    rect.setAttribute("y", y);
-    rect.setAttribute("width", blockWidth);
-    rect.setAttribute("height", scale);
+  document.getElementById("heightInput").value = "";
 
-    if (row < wall) {
-      rect.setAttribute("fill", "#333");
-    } else if (row < wall + waterAbove) {
-      rect.setAttribute("fill", "skyblue");
-    } else {
-      rect.setAttribute("fill", "#eee");
+  for (let i = 0; i < n; i++) {
+    const wall = heights[i];
+    const waterAbove = water[i];
+
+    for (let row = 0; row < maxHeight; row++) {
+      const x = i * (blockWidth + blockSpacing);
+      const y = svgHeight - (row + 1) * scale;
+
+      const rect = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "rect"
+      );
+      rect.setAttribute("x", x);
+      rect.setAttribute("y", y);
+      rect.setAttribute("width", blockWidth);
+      rect.setAttribute("height", scale);
+
+      if (row < wall) {
+        rect.setAttribute("fill", "#333");
+      } else if (row < wall + waterAbove) {
+        rect.setAttribute("fill", "skyblue");
+      } else {
+        rect.setAttribute("fill", "#eee");
+      }
+
+      svg.appendChild(rect);
     }
-
-    svg.appendChild(rect);
   }
 }
